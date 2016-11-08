@@ -1,0 +1,22 @@
+{
+  "version": "0.5.0-*",
+  "dependencies": {
+    "BeetleX": "0.8.6",
+    "NETStandard.Library": "1.6.0",
+    "protobuf-net": "2.1.0",
+    "System.Net.NameResolution": "4.0.0",
+    "System.Threading.Thread": "4.0.0",
+    "System.Threading.ThreadPool": "4.0.10",
+    "Microsoft.NETCore.Portable.Compatibility": "1.0.0",
+    "System.Net.NetworkInformation": "4.1.0",
+    "System.Runtime.Extensions": "4.1.0"
+  },
+  "frameworks": {
+    "netstandard1.6": {
+      "imports": "dnxcore50"
+    }
+  },
+  "buildOptions": {
+    "define": [ "DOTNET_CORE" ]
+  }
+}

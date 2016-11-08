@@ -1,0 +1,7 @@
+#:D:\dev\SmartRoute\SmartRoute\src\SmartRoute\SmartRoute.xproj
+#:D:\dev\SmartRoute\SmartRoute\src\SmartRoute.NodeTest\SmartRoute.NodeTest.xproj
+D:\dev\SmartRoute\SmartRoute\src\SmartRoute.NodeTest\SmartRoute.NodeTest.xproj|D:\dev\SmartRoute\SmartRoute\src\SmartRoute\SmartRoute.xproj
+D:\dev\SmartRoute\SmartRoute\src\SmartRoute.NodeTest\SmartRoute.NodeTest.xproj|D:\dev\SmartRoute\SmartRoute\src\SmartRoute.NodeTest.Messages\SmartRoute.NodeTest.Messages.xproj
+#:D:\dev\SmartRoute\SmartRoute\src\SmartRoute.NodeTest2\SmartRoute.NodeTest2.xproj
+D:\dev\SmartRoute\SmartRoute\src\SmartRoute.NodeTest2\SmartRoute.NodeTest2.xproj|D:\dev\SmartRoute\SmartRoute\src\SmartRoute\SmartRoute.xproj
+D:\dev\SmartRoute\SmartRoute\src\SmartRoute.NodeTest2\SmartRoute.NodeTest2.xproj|D:\dev\SmartRoute\SmartRoute\src\SmartRoute.NodeTest.Messages\SmartRoute.NodeTest.Messages.xproj
