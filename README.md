@@ -9,8 +9,6 @@
         public static void Main(string[] args)
         {
             INode node = NodeFactory.Default;
-            node.Loger.Type = LogType.ALL;
-            node.AddLogHandler(new SmartRoute.ConsoleLogHandler(LogType.ALL));
             node.Open();
             EventSubscriber henry = node.Register<EventSubscriber>("henry");
             henry.Register<User>(OnUser);
@@ -38,8 +36,6 @@
         public static void Main(string[] args)
         {
             INode node = NodeFactory.Default;
-            node.Loger.Type = LogType.ALL;
-            node.AddLogHandler(new SmartRoute.ConsoleLogHandler(LogType.ALL));
             node.Open();
             EventSubscriber ken = node.Register<EventSubscriber>("ken");
             ken.Register<User>(OnUser);
@@ -69,4 +65,9 @@
             System.Threading.Interlocked.Increment(ref mCount);
         }
     }
+```
+## 提供同步返回消息支持 2016-11-10
+   由于很多场景需要支持同步返回消息处理，因此加入些功能的支持
+``` c#
+  Employee result = ken.Publish<Employee>("henry", Employee.GetEmployee());
 ```
