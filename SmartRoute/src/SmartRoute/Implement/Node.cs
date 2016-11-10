@@ -6,6 +6,7 @@ using BeetleX;
 using BeetleX.EventArgs;
 using SmartRoute.Events;
 using SmartRoute.Protocols;
+using System.Collections.Concurrent;
 
 namespace SmartRoute
 {
@@ -212,6 +213,7 @@ namespace SmartRoute
         public void SessionReceive(IServer server, SessionReceiveEventArgs e)
         {
 
+
         }
 
         private void ProcessMessage(IServer server, ISession session, object message)
@@ -393,7 +395,7 @@ namespace SmartRoute
             }
         }
 
-        public void Publish(Message message)
+        private void OnPulish(Message message)
         {
             message.Track("node publish message");
             if (!SubscriberCenter.IsSubscribers(message.Consumers) && message.Mode == ReceiveMode.Eq)
@@ -443,6 +445,58 @@ namespace SmartRoute
             }
         }
 
+        private ConcurrentDictionary<long, PublishResult> mAsyncResults = new ConcurrentDictionary<long, PublishResult>();
+
+        [ThreadStatic]
+        private static PublishResult mPublishResult;
+
+        public T Publish<T>(Message message, int millisecondsTimeout = 10000)
+        {
+            if (mPublishResult == null)
+                mPublishResult = new SmartRoute.PublishResult();
+            mPublishResult.Reset();
+            try
+            {
+                mAsyncResults[message.ID] = mPublishResult;
+                message.AsyncResult = mPublishResult;
+                OnPulish(message);
+                bool timeout = !mPublishResult.Wait(millisecondsTimeout);
+                if (timeout)
+                {
+                    throw new SRException("publish message timeout!");
+                }
+                else
+                {
+                    if (mPublishResult.Error != null)
+                        throw mPublishResult.Error;
+                    if (mPublishResult.Result is Protocols.Error)
+                        throw new SRException(((Protocols.Error)mPublishResult.Result).Message);
+                    
+                }
+
+            }
+            finally
+            {
+                PublishResult result;
+                mAsyncResults.TryRemove(message.ID, out result);
+            }
+            return (T)mPublishResult.Result;
+
+        }
+
+        public void Publish(Message message)
+        {
+            PublishResult result;
+            if (mAsyncResults.TryGetValue(message.ID, out result))
+            {
+                result.Completed(message.Data, null);
+            }
+            else
+            {
+                OnPulish(message);
+            }
+        }
+
         public T Register<T>(string name) where T : ISubscriber, new()
         {
             T item = new T();
@@ -479,6 +533,8 @@ namespace SmartRoute
             if (SubscriberRegisted != null)
                 SubscriberRegisted(this, e);
         }
+
+
 
         public EventSubscriberRegisted SubscriberRegisted
         {

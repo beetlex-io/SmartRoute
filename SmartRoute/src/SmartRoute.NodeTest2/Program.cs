@@ -18,15 +18,11 @@ namespace SmartRoute.NodeTest2
             EventSubscriber ken = node.Register<EventSubscriber>("ken");
             ken.Register<User>(OnUser);
             ken.Register<Employee>(OnEmployees);
-            EventSubscriber mark = node.Register<EventSubscriber>("mark");
-            mark.Register<User>(OnUser);
-            mark.Register<Employee>(OnEmployees);
             node.SubscriberRegisted = (n, s) =>
             {
                 if (s.Name == "henry")
                 {
                     ken.Publish("henry", Employee.GetEmployee());
-                    mark.Publish("henry", Employee.GetEmployee());
                 }
             };
 

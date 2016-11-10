@@ -104,9 +104,11 @@ namespace SmartRoute
             Node.Publish(message);
         }
 
+
         public void Publish(string consumer, object data, ReceiveMode mode = ReceiveMode.Eq)
         {
             Message msg = new Message();
+            msg.Mode = mode;
             msg.Pulisher = this.Name;
             msg.Consumers = consumer;
             msg.Data = data;
@@ -116,6 +118,19 @@ namespace SmartRoute
         public override string ToString()
         {
             return Name;
+        }
+        public T Publish<T>(string consumer, object data, int millisecondsTimeout = 10000)
+        {
+            Message msg = new Message();
+            msg.Pulisher = this.Name;
+            msg.Mode = ReceiveMode.Eq;
+            msg.Consumers = consumer;
+            msg.Data = data;
+            return Publish<T>(msg, millisecondsTimeout);
+        }
+        public T Publish<T>(Message message, int millisecondsTimeout = 10000)
+        {
+            return Node.Publish<T>(message, millisecondsTimeout);
         }
     }
 }

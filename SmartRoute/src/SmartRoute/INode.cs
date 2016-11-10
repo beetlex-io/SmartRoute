@@ -39,6 +39,8 @@ namespace SmartRoute
 
         void Publish(Message message);
 
+        T Publish<T>(Message message, int millisecondsTimeout);
+
         ICollection<ISubscriber> GetLocalSubscriber();
 
         ICollection<ISubscriber> GetRemoteSubscriber();

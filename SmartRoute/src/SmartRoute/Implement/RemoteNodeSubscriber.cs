@@ -58,5 +58,7 @@ namespace SmartRoute
         {
             return string.Format("{0}@{1}", Name, mConnection.RemoteNodeID);
         }
+
+
     }
 }

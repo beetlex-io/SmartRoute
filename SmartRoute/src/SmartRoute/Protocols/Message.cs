@@ -82,8 +82,17 @@ namespace SmartRoute
 
         internal void ProcessError(Exception error)
         {
-
+            if (AsyncResult != null)
+            {
+                AsyncResult.Completed(null, error);
+            }
         }
+
+        internal PublishResult AsyncResult
+        {
+            get; set;
+        }
+
         #region track process time
 
         class TrackItem
@@ -92,10 +101,7 @@ namespace SmartRoute
             public double Time { get; set; }
         }
 
-
         private Queue<TrackItem> mTracks = null;
-
-
 
         [Conditional("DEBUG")]
         public void Track(string name)
