@@ -71,3 +71,8 @@
 ``` c#
   Employee result = ken.Publish<Employee>("henry", Employee.GetEmployee());
 ```
+## 提供订阅负载 2016－11－24
+通过SwitchSubscriber实现多节点订阅负载处理
+``` c#
+ IList<Employee> item = mSwitchSubscriber.PublishToServicee<IList<Employee>>("henry", Employee.GetEmployee());
+```
