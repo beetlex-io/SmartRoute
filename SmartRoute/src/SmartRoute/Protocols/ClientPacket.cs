@@ -54,16 +54,19 @@ namespace SmartRoute.Protocols
                     }
                     if (reader.Length < mSize)
                         return;
+
                     Type type = TypeHandler.ReadType(reader);
                     int bodySize = reader.ReadInt32();
                     data = reader.Stream.Deserialize(bodySize, type);
                     Message msg = data as Message;
                     if (msg != null)
                     {
+                        msg.Track("message decode start");
                         msg.IsLocal = false;
                         int datasize = reader.ReadInt32();
                         Type dataType = TypeHandler.GetType(msg.DataType);
                         msg.Data = reader.Stream.Deserialize(datasize, dataType);
+                        msg.Track("message decode completed");
                     }
                     mSize = 0;
                 }
@@ -120,9 +123,10 @@ namespace SmartRoute.Protocols
                         datasize.SetData((int)writer.Length - dataStartlength);
                     }
                     msg.Track("message write body completed!");
+                    msg.Track("message size:" + writer.Length);
                 }
                 msgsize.SetData((int)writer.Length - length);
-
+               
             }
         }
     }

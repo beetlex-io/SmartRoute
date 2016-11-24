@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SmartRoute.NodeTest2
+namespace SmartRoute.NodeService
 {
     public class Program
     {
@@ -16,35 +16,27 @@ namespace SmartRoute.NodeTest2
             node.Loger.Type = LogType.ALL;
             node.AddLogHandler(new SmartRoute.ConsoleLogHandler(LogType.ALL));
             node.Open();
-            EventSubscriber ken = node.Register<EventSubscriber>("ken");
-            ken.Register<User>(OnUser);
-            ken.Register<Employee>(OnEmployees);
-            node.SubscriberRegisted = (n, s) =>
-            {
-                if (s.Name == "henry")
-                {
-                    ken.Publish("henry", Employee.GetEmployee());
-                }
-            };
-
+            SwitchSubscriber switchSubscriber = new SwitchSubscriber(node);
+            EventSubscriber henry = switchSubscriber.GetService("henry");
+            henry.Register<User>(OnUser);
+            henry.Register<Employee>(OnEmployees);
             while (true)
             {
-                Console.WriteLine("{0}/s|{1}", mCount - mLastCount, mCount);
+                Console.WriteLine("{0}/秒|{1}", mCount - mLastCount, mCount);
                 mLastCount = mCount;
                 System.Threading.Thread.Sleep(1000);
             }
             Console.Read();
         }
-
         private static void OnEmployees(Message msg, Employee emp)
         {
             System.Threading.Interlocked.Increment(ref mCount);
-            msg.Reply(Employee.GetEmployee());
+            msg.Reply(Employee.GetEmployees(2));
         }
         private static void OnUser(Message msg, User user)
         {
             System.Threading.Interlocked.Increment(ref mCount);
-            msg.Reply(Employee.GetEmployee());
+            msg.Reply(new User { Name = "henry" });
         }
     }
 }

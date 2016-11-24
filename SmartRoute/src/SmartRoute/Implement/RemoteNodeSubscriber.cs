@@ -39,7 +39,7 @@ namespace SmartRoute
             {
                 message.Track("reply message send");
                 mConnection.Send(message);
-                message.EndTrack("reply message send completed");
+                message.EndTrack("reply message send completed",Node);
             }
             else
             {

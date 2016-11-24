@@ -9,6 +9,7 @@ namespace SmartRoute.NodeTest
     public class Program
     {
         static long mCount;
+        static long mLastCount;
         public static void Main(string[] args)
         {
             INode node = NodeFactory.Default;
@@ -18,6 +19,12 @@ namespace SmartRoute.NodeTest
             EventSubscriber henry = node.Register<EventSubscriber>("henry");
             henry.Register<User>(OnUser);
             henry.Register<Employee>(OnEmployees);
+            while (true)
+            {
+                Console.WriteLine("{0}/s|{1}", mCount - mLastCount, mCount);
+                mLastCount = mCount;
+                System.Threading.Thread.Sleep(1000);
+            }
             Console.Read();
         }
         private static void OnEmployees(Message msg, Employee emp)

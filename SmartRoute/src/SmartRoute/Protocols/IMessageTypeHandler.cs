@@ -53,7 +53,7 @@ namespace SmartRoute.Protocols
             if (!mTypeNames.TryGetValue(type, out result))
             {
                 TypeInfo info = type.GetTypeInfo();
-                if (info.Name.IndexOf("System") >= 0)
+                if (info.FullName.IndexOf("System") >= 0)
                     result = info.FullName;
                 else
                     result = string.Format("{0},{1}", info.FullName, info.Assembly.GetName().Name);

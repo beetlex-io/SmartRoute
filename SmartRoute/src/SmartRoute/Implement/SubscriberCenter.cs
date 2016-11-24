@@ -33,6 +33,11 @@ namespace SmartRoute
 
         class SubscriberSegment
         {
+            public SubscriberSegment()
+            {
+                Version = -1;
+            }
+
             public long Version
             {
                 get; set;

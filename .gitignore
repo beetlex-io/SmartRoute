@@ -8,3 +8,9 @@ SmartRoute/src/SmartRoute.NodeTest.Messages/bin/
 SmartRoute/src/SmartRoute.NodeTest.Messages/obj/
 SmartRoute/src/SmartRoute.SyncPublishTest/bin/
 SmartRoute/src/SmartRoute.SyncPublishTest/obj/
+SmartRoute/src/SmartRoute.NodeService/bin/
+SmartRoute/src/SmartRoute.NodeService/obj/
+SmartRoute/src/SmartRoute.NodeServiceClient/bin/
+SmartRoute/src/SmartRoute.NodeServiceClient/obj/
+SmartRoute/src/SmartRoute.PacketTest/bin/
+SmartRoute/src/SmartRoute.PacketTest/obj/

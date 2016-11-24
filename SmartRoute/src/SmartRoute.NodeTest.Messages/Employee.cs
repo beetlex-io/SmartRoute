@@ -77,7 +77,8 @@ namespace SmartRoute.NodeTest.Messages
             result.HomePhone = "(206) 555-9857";
             result.Extension = "5467";
             result.Photo = "EmpID1.bmp";
-            result.Notes = "Education includes a BA in psychology from Colorado State University.  She also completed &quot;The Art of the Cold Call.&quot;  Nancy is a member of Toastmasters International.";
+            //result.Notes = "Education includes a BA in psychology from Colorado State University.  She also completed &quot;The Art of the Cold Call.&quot;  Nancy is a member of Toastmasters International.";
+            result.Notes = "Education includes";
             return result;
         }
 

@@ -59,8 +59,8 @@ namespace SmartRoute
             result.Pulisher = Consumers;
             result.Data = body;
             result.Track("reply message");
-            if (Subscriber != null)
-                Subscriber.Publish(result);
+            Subscriber.Publish(result);
+            result.EndTrack("reply message completed!", Subscriber.Node);
         }
 
         internal bool IsLocal { get; set; }
@@ -74,6 +74,7 @@ namespace SmartRoute
             result.DataType = DataType;
             result.Mode = this.Mode;
             result.Data = Data;
+            result.Subscriber = this.Subscriber;
             return result;
 
         }
@@ -115,17 +116,21 @@ namespace SmartRoute
             mTracks.Enqueue(item);
         }
         [Conditional("DEBUG")]
-        public void EndTrack(string name)
+        public void EndTrack(string name, INode node)
         {
             Track(name);
-
+            int i = 0;
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
             while (mTracks.Count > 0)
             {
                 TrackItem item = mTracks.Dequeue();
-                sb.AppendFormat("{0}\t time:{1}\r\n", item.Name, item.Time);
+                if (i == 0)
+                    sb.AppendFormat("{0}\t time:{1}\r\n", item.Name, item.Time);
+                else
+                    sb.AppendFormat("\t\t\t{0}\t time:{1}\r\n", item.Name, item.Time);
+                i++;
             }
-            Subscriber.Node.Loger.Process(LogType.DEBUG, sb.ToString());
+            node.Loger.Process(LogType.DEBUG, sb.ToString());
         }
 
         #endregion

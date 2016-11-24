@@ -26,6 +26,13 @@ namespace SmartRoute
         }
 
 
+        public override bool Equals(object obj)
+        {
+            if (obj is EventSubscriber)
+                return this.Name == ((EventSubscriber)obj).Name;
+            return this.Name == obj.ToString();
+        }
+
         interface IMessageHandler
         {
             void Invoke(Message message);
@@ -84,7 +91,7 @@ namespace SmartRoute
                 }
                 else
                 {
-                    string error = string.Format("{0} message({1}) handler notfound!", Name, message);
+                    string error = string.Format("{0} message({1}) handler notfound!", Name, key);
                     message.ProcessError(new SRException(error));
                     Node.Loger.Process(LogType.ERROR, error);
                 }
@@ -96,7 +103,7 @@ namespace SmartRoute
                 message.ProcessError(new SRException(error, e_));
                 Node.Loger.Process(LogType.ERROR, error);
             }
-            message.EndTrack("subscriber process message completed");
+            message.Track("subscriber process message completed");
         }
 
         public void Publish(Message message)
@@ -119,6 +126,7 @@ namespace SmartRoute
         {
             return Name;
         }
+
         public T Publish<T>(string consumer, object data, int millisecondsTimeout = 10000)
         {
             Message msg = new Message();
@@ -133,4 +141,18 @@ namespace SmartRoute
             return Node.Publish<T>(message, millisecondsTimeout);
         }
     }
+
+    public class ServiceEventSubscriber : EventSubscriber
+    {
+        public string Service { get; set; }
+
+        public Protocols.ServiceSubscriberItem GetInfo()
+        {
+            Protocols.ServiceSubscriberItem item = new Protocols.ServiceSubscriberItem();
+            item.Name = Name;
+            item.Service = Service;
+            return item;
+        }
+    }
+
 }

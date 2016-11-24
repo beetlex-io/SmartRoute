@@ -244,6 +244,7 @@ namespace SmartRoute
             {
                 ((Message)message).Track("node receive message");
                 Publish((Message)message);
+                ((Message)message).EndTrack("node receive message completed!", this);
             }
             else
             {
@@ -304,7 +305,9 @@ namespace SmartRoute
             }
             else if (message is Message)
             {
+                ((Message)message).Track("node receive message");
                 Publish((Message)message);
+                ((Message)message).EndTrack("node receive message completed!", this);
             }
         }
 
@@ -342,7 +345,9 @@ namespace SmartRoute
                     {
                         subscriber = new SessionSubscriber(this, name, session);
                         mRemoteSubscriberCenter.Register(name, subscriber);
+                        Loger.Process(LogType.DEBUG, "remote {0} registed to SessionSubscriber", name);
                         OnSubscriberRegisted(subscriber);
+
                     }
                     else
                     {
@@ -351,6 +356,7 @@ namespace SmartRoute
                         {
                             subscriber = new RemoteNodeSubscriber(name, this, connection);
                             mRemoteSubscriberCenter.Register(name, subscriber);
+                            Loger.Process(LogType.DEBUG, "remote {0} registed to RemoteNodeSubscriber", name);
                             OnSubscriberRegisted(subscriber);
                         }
                     }
@@ -363,6 +369,7 @@ namespace SmartRoute
                     {
                         subscriber = new RemoteNodeSubscriber(name, this, connection);
                         mRemoteSubscriberCenter.Register(name, subscriber);
+                        Loger.Process(LogType.DEBUG, "remote {0} registed to RemoteNodeSubscriber", name);
                         OnSubscriberRegisted(subscriber);
                     }
                 }
@@ -400,16 +407,22 @@ namespace SmartRoute
             message.Track("node publish message");
             if (!SubscriberCenter.IsSubscribers(message.Consumers) && message.Mode == ReceiveMode.Eq)
             {
+                message.Track("match consumers start");
                 ISubscriber subs = mLocalSubscriberCenter.Find(message.Consumers);
+                message.Track("match consumers completed");
                 if (subs != null)
                 {
+                    message.Track("publish to " + message.Consumers + subs.GetType());
                     subs.Process(this, message);
+                    message.Track("publish to " + message.Consumers + " completed!");
                     return;
                 }
                 subs = mRemoteSubscriberCenter.Find(message.Consumers);
                 if (subs != null)
                 {
+                    message.Track("publish to " + message.Consumers + subs.GetType());
                     subs.Process(this, message);
+                    message.Track("publish to " + message.Consumers + " completed!");
                     return;
                 }
                 string error = string.Format("[{0}] subscriber not fount!", message.Consumers);
@@ -419,8 +432,10 @@ namespace SmartRoute
             else
             {
                 IList<ISubscriber> local, remote;
+                message.Track("match consumers start");
                 local = mLocalSubscriberCenter.Find(message);
                 remote = mRemoteSubscriberCenter.Find(message);
+                message.Track("match consumers completed");
                 if (local.Count == 0 && remote.Count == 0)
                 {
                     string error = string.Format("[{0}] subscriber not fount!", message.Consumers);
@@ -430,19 +445,28 @@ namespace SmartRoute
                 }
                 foreach (ISubscriber item in local)
                 {
+                    if (message.Pulisher == item.Name)
+                        continue;
                     Message sendMsg = message.Copy();
                     sendMsg.Consumers = item.Name;
+
                     sendMsg.Mode = ReceiveMode.Eq;
+                    message.Track("publish to " + sendMsg.Consumers + item.GetType());
                     item.Process(this, sendMsg);
+                    message.Track("publish to " + sendMsg.Consumers + " completed!");
                 }
                 foreach (ISubscriber item in remote)
                 {
                     Message sendMsg = message.Copy();
                     sendMsg.Consumers = item.Name;
+
                     sendMsg.Mode = ReceiveMode.Eq;
+                    message.Track("publish to " + sendMsg.Consumers + item.GetType());
                     item.Process(this, sendMsg);
+                    message.Track("publish to " + sendMsg.Consumers + " completed!");
                 }
             }
+
         }
 
         private ConcurrentDictionary<long, PublishResult> mAsyncResults = new ConcurrentDictionary<long, PublishResult>();
@@ -471,7 +495,7 @@ namespace SmartRoute
                         throw mPublishResult.Error;
                     if (mPublishResult.Result is Protocols.Error)
                         throw new SRException(((Protocols.Error)mPublishResult.Result).Message);
-                    
+
                 }
 
             }
@@ -534,7 +558,10 @@ namespace SmartRoute
                 SubscriberRegisted(this, e);
         }
 
-
+        public long GetRuntime()
+        {
+            return mServer.GetRunTime();
+        }
 
         public EventSubscriberRegisted SubscriberRegisted
         {
