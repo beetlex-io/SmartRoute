@@ -1,5 +1,43 @@
 # SmartRoute（服务即集群）
   SmartRoute是基于Dotnet Core设计的可运行在linux和windows下的服务通讯组件，其设计理念是去中心化和零配置即可实现服务通讯集群。SmartRoute是通过消息订阅的机制实现服务与服务之间的通讯，它可以让广播网段内所有服务器上的应用自动构建通讯集群； 而通讯集群完全是SmartRoute自动构建并不需要进行任何配置或安装中间服务。通过这种全新的通讯开发方式可以让开发者更轻松和简单地构建基于服务的集群通讯应用。
+##　提供远程接口调用功能 2017-2-14　
+    注册接口服务
+```
+	public class Program : IUserService
+	{
+		public static void Main(string[] args)
+		{
+			INode node = SmartRoute.NodeFactory.Default;
+			node.Loger.Type = LogType.ALL;
+			node.AddLogHandler(new SmartRoute.ConsoleLogHandler(LogType.ALL));
+			node.Open();
+			SwitchSubscriber rmiserver = new SwitchSubscriber(node);
+			rmiserver.Register<IUserService>(new Program());
+			System.Threading.Thread.Sleep(-1);
+		}
+
+		public void ChangePWD(string name, string oldpwd, string newpwd)
+		{
+			Console.WriteLine("ChangePWD {0}/{1}/{2}", name, oldpwd, newpwd);
+		}
+
+		public DateTime Register(string name, string email)
+		{
+			Console.WriteLine("register {0}/{1}", name, email);
+			return DateTime.Now;
+		}
+	}
+```
+    调用接口服务
+```
+			INode node = NodeFactory.Default;
+			node.Loger.Type = LogType.ALL;
+			node.AddLogHandler(new ConsoleLogHandler(LogType.ALL));
+			node.Open();
+			SwitchSubscriber rmiserver = new SwitchSubscriber(node);
+			mUserService = new UserService(rmiserver);
+      DateTime result = mUserService.Register("henry" + i, "hrenyfan@msn.com");
+```
 ## 提供订阅负载 2016－11－24
 　　　通过SwitchSubscriber实现多节点订阅负载处理
 ``` c#
