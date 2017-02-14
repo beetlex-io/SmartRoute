@@ -138,7 +138,7 @@ namespace SmartRoute
         }
         public T Publish<T>(Message message, int millisecondsTimeout = 10000)
         {
-            return Node.Publish<T>(message, millisecondsTimeout);
+            return Node.PublishSync<T>(message, millisecondsTimeout);
         }
     }
 

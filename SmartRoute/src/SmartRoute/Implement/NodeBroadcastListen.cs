@@ -13,9 +13,6 @@ namespace SmartRoute
 {
     class NodeBroadcastListen : INodeBroadcastListen
     {
-
-
-
         public NodeBroadcastListen(string cluster, string host, int port, string nodeid, string tokenKey)
         {
             NodeID = nodeid;
@@ -23,8 +20,8 @@ namespace SmartRoute
             Port = port;
             this.Cluster = cluster;
             mTokenKey = tokenKey;
-
         }
+
         [ProtoBuf.ProtoContract]
         public class BrodcastMessage
         {
@@ -147,11 +144,8 @@ namespace SmartRoute
                     }
                 }
             }
-
             BroadcastSend();
-
             BroadcastReceive();
-
             Loger.Process(LogType.BROAD_DEBUG, "{0} node discover start", NodeID);
         }
 
@@ -210,7 +204,6 @@ namespace SmartRoute
                             msg.IP = ((IPEndPoint)e.RemoteEndPoint).Address.ToString();
                         try
                         {
-
                             if (!mDiscoverTable.ContainsKey(msg.NodeID))
                             {
                                 DiscoverEventArgs de = new DiscoverEventArgs();
@@ -262,11 +255,9 @@ namespace SmartRoute
                 }
                 catch (Exception e_)
                 {
-
                     Loger.Process(LogType.BROAD_ERROR, "broadcast socket bind error {0}", e_.Message);
                 }
             }
-
             Loger.Process(LogType.ERROR, "broadcast socket bind error!");
 
         }
@@ -287,7 +278,6 @@ namespace SmartRoute
             {
                 try
                 {
-
                     for (int i = 0; i < 20; i++)
                     {
                         mEndPoint = new IPEndPoint(IPAddress.Broadcast, mPort + i);
@@ -295,9 +285,7 @@ namespace SmartRoute
                         {
                             client.SendNodeInfo(data, mEndPoint);
                         }
-
                     }
-
                     Loger.Process(LogType.BROAD_DEBUG, "broadcast send {0}", msg);
                 }
                 catch (Exception e_)
@@ -326,9 +314,7 @@ namespace SmartRoute
             public BroadcastUdpClient()
                 : base()
             {
-
                 Socket s = this.Client;
-
                 s.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, 1);
                 s.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.DontRoute, 1);
             }
@@ -336,9 +322,7 @@ namespace SmartRoute
             public BroadcastUdpClient(IPEndPoint ipLocalEndPoint)
                 : base(ipLocalEndPoint)
             {
-
                 Socket s = this.Client;
-
                 s.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, 1);
                 s.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.DontRoute, 1);
             }

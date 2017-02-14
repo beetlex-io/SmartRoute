@@ -12,6 +12,7 @@ namespace SmartRoute.NodeService
         static long mLastCount;
         public static void Main(string[] args)
         {
+
             INode node = NodeFactory.Default;
             node.Loger.Type = LogType.ALL;
             node.AddLogHandler(new SmartRoute.ConsoleLogHandler(LogType.ALL));

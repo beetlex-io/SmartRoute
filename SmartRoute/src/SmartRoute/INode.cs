@@ -41,7 +41,9 @@ namespace SmartRoute
 
         void Publish(Message message);
 
-        T Publish<T>(Message message, int millisecondsTimeout = 10000);
+        T PublishSync<T>(Message message, int millisecondsTimeout = 10000);
+
+        object PublishSync(Message message, int millisecondsTimeout = 10000);
 
         ICollection<ISubscriber> GetLocalSubscriber();
 

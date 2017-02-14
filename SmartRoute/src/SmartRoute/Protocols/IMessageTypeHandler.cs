@@ -14,28 +14,76 @@ namespace SmartRoute.Protocols
 
         void WriteType(object data, BeetleX.Buffers.IBinaryWriter writer);
 
-        string GetTypeName(Type type);
+        MessageType GetMessageType(string typeName);
 
-        Type GetType(string typeName);
+        MessageType GetMessageType(Type type);
     }
+
+    public class MessageType
+    {
+
+        public MessageType(string typeName)
+        {
+            Type = Type.GetType(typeName);
+            if (Type == null)
+                throw new SRException("{0} type not found!", typeName);
+            Init();
+        }
+
+        public MessageType(Type type)
+        {
+            Type = type;
+            Init();
+        }
+
+        private void Init()
+        {
+            TypeInfo info = Type.GetTypeInfo();
+            if (info.FullName.IndexOf("System") >= 0)
+                TypeName = info.FullName;
+            else
+                TypeName = string.Format("{0},{1}", info.FullName, info.Assembly.GetName().Name);
+            Type[] interfaces = Type.GetInterfaces();
+            IsCustomSerializer = interfaces.Contains(typeof(ISerializer));
+
+        }
+
+        public Type Type { get; private set; }
+
+        public bool IsCustomSerializer { get; private set; }
+
+        public string TypeName { get; set; }
+
+        public ISerializer Create()
+        {
+            return (ISerializer)Activator.CreateInstance(Type);
+        }
+    }
+
 
     public class MessageTypeHandler : IMessageTypeHandler
     {
-        private System.Collections.Concurrent.ConcurrentDictionary<Type, string> mTypeNames = new System.Collections.Concurrent.ConcurrentDictionary<Type, string>();
+        private System.Collections.Concurrent.ConcurrentDictionary<Type, MessageType> mTypeNames = new System.Collections.Concurrent.ConcurrentDictionary<Type, MessageType>();
 
-        private System.Collections.Concurrent.ConcurrentDictionary<string, Type> mNameTypes = new System.Collections.Concurrent.ConcurrentDictionary<string, Type>();
+        private System.Collections.Concurrent.ConcurrentDictionary<string, MessageType> mNameTypes = new System.Collections.Concurrent.ConcurrentDictionary<string, MessageType>();
 
-        public Type GetType(string typeName)
+        public MessageType GetMessageType(Type type)
         {
-            Type result;
+            MessageType result;
+            if (!mTypeNames.TryGetValue(type, out result))
+            {
+                result = new MessageType(type);
+                mTypeNames[type] = result;
+            }
+            return result;
+        }
+
+        public MessageType GetMessageType(string typeName)
+        {
+            MessageType result;
             if (!mNameTypes.TryGetValue(typeName, out result))
             {
-                if (typeName == null)
-                    throw new SRException("{0} type not found!", typeName);
-                result = Type.GetType(typeName);
-                if (result == null)
-                    throw new SRException("{0} type not found!", typeName);
-
+                result = new MessageType(typeName);
                 mNameTypes[typeName] = result;
             }
             return result;
@@ -44,30 +92,18 @@ namespace SmartRoute.Protocols
         public Type ReadType(IBinaryReader reader)
         {
             string typeName = reader.ReadLine();
-            return GetType(typeName);
+            return GetMessageType(typeName).Type;
         }
 
-        public string GetTypeName(Type type)
-        {
-            string result;
-            if (!mTypeNames.TryGetValue(type, out result))
-            {
-                TypeInfo info = type.GetTypeInfo();
-                if (info.FullName.IndexOf("System") >= 0)
-                    result = info.FullName;
-                else
-                    result = string.Format("{0},{1}", info.FullName, info.Assembly.GetName().Name);
-                mTypeNames[type] = result;
-            }
-            return result;
-        }
 
         public void WriteType(object data, IBinaryWriter writer)
         {
 
-            string name = GetTypeName(data.GetType());
+            string name = GetMessageType(data.GetType()).TypeName;
             writer.WriteLine(name);
         }
+
+
     }
 
 }

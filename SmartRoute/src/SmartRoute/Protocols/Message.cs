@@ -7,140 +7,140 @@ using System.Threading.Tasks;
 
 namespace SmartRoute
 {
-    [ProtoContract]
-    public class Message
-    {
+	[ProtoContract]
+	public class Message
+	{
 
-        private static System.Diagnostics.Stopwatch mWatch;
+		private static System.Diagnostics.Stopwatch mWatch;
 
-        private static System.Diagnostics.Stopwatch GetWatch()
-        {
-            if (mWatch == null)
-            {
-                mWatch = new Stopwatch();
-                mWatch.Restart();
+		private static System.Diagnostics.Stopwatch GetWatch()
+		{
+			if (mWatch == null)
+			{
+				mWatch = new Stopwatch();
+				mWatch.Restart();
 
-            }
-            return mWatch;
-        }
+			}
+			return mWatch;
+		}
 
 
-        public Message()
-        {
-            ID = System.Threading.Interlocked.Increment(ref mID);
-            Mode = ReceiveMode.Eq;
-            IsLocal = true;
-        }
+		public Message()
+		{
+			ID = System.Threading.Interlocked.Increment(ref mID);
+			Mode = ReceiveMode.Eq;
+			IsLocal = true;
+		}
 
-        private static long mID = 0;
+		private static long mID = 0;
 
-        [ProtoMember(1)]
-        public long ID { get; set; }
+		[ProtoMember(1)]
+		public long ID { get; set; }
 
-        [ProtoMember(2)]
-        public string Pulisher { get; set; }
+		[ProtoMember(2)]
+		public string Pulisher { get; set; }
 
-        [ProtoMember(3)]
-        public string Consumers { get; set; }
+		[ProtoMember(3)]
+		public string Consumers { get; set; }
 
-        [ProtoMember(4)]
-        public string DataType { get; set; }
+		[ProtoMember(4)]
+		public string DataType { get; set; }
 
-        [ProtoMember(5)]
-        public ReceiveMode Mode { get; set; }
+		[ProtoMember(5)]
+		public ReceiveMode Mode { get; set; }
 
-        public object Data { get; set; }
+		public object Data { get; set; }
 
-        public void Reply(object body)
-        {
-            Message result = new Message();
-            result.ID = ID;
-            result.Consumers = Pulisher;
-            result.Pulisher = Consumers;
-            result.Data = body;
-            result.Track("reply message");
-            Subscriber.Publish(result);
-            result.EndTrack("reply message completed!", Subscriber.Node);
-        }
+		public void Reply(object body)
+		{
+			Message result = new Message();
+			result.ID = ID;
+			result.Consumers = Pulisher;
+			result.Pulisher = Consumers;
+			result.Data = body;
+			result.Track("reply message");
+			Subscriber.Publish(result);
+			result.EndTrack("reply message completed!", Subscriber.Node);
+		}
 
-        internal bool IsLocal { get; set; }
+		internal bool IsLocal { get; set; }
 
-        public Message Copy()
-        {
-            Message result = new Message();
-            result.ID = this.ID;
-            result.Pulisher = this.Pulisher;
-            result.Consumers = this.Consumers;
-            result.DataType = DataType;
-            result.Mode = this.Mode;
-            result.Data = Data;
-            result.Subscriber = this.Subscriber;
-            return result;
+		public Message Copy()
+		{
+			Message result = new Message();
+			result.ID = this.ID;
+			result.Pulisher = this.Pulisher;
+			result.Consumers = this.Consumers;
+			result.DataType = DataType;
+			result.Mode = this.Mode;
+			result.Data = Data;
+			result.Subscriber = this.Subscriber;
+			return result;
 
-        }
+		}
 
-        public ISubscriber Subscriber { get; set; }
+		public ISubscriber Subscriber { get; set; }
 
-        internal void ProcessError(Exception error)
-        {
-            if (AsyncResult != null)
-            {
-                AsyncResult.Completed(null, error);
-            }
-        }
+		internal void ProcessError(Exception error)
+		{
+			if (AsyncResult != null)
+			{
+				AsyncResult.Completed(null, error);
+			}
+		}
 
-        internal PublishResult AsyncResult
-        {
-            get; set;
-        }
+		internal PublishResult AsyncResult
+		{
+			get; set;
+		}
 
-        #region track process time
+		#region track process time
 
-        class TrackItem
-        {
-            public string Name { get; set; }
-            public double Time { get; set; }
-        }
+		class TrackItem
+		{
+			public string Name { get; set; }
+			public double Time { get; set; }
+		}
 
-        private Queue<TrackItem> mTracks = null;
+		private Queue<TrackItem> mTracks = null;
 
-        [Conditional("DEBUG")]
-        public void Track(string name)
-        {
-            if (mTracks == null)
-            {
-                mTracks = new Queue<SmartRoute.Message.TrackItem>();
+		[Conditional("DEBUG")]
+		public void Track(string name)
+		{
+			if (mTracks == null)
+			{
+				mTracks = new Queue<SmartRoute.Message.TrackItem>();
 
-            }
-            TrackItem item = new SmartRoute.Message.TrackItem { Name = name, Time = GetWatch().Elapsed.TotalMilliseconds };
-            mTracks.Enqueue(item);
-        }
-        [Conditional("DEBUG")]
-        public void EndTrack(string name, INode node)
-        {
-            Track(name);
-            int i = 0;
-            System.Text.StringBuilder sb = new System.Text.StringBuilder();
-            while (mTracks.Count > 0)
-            {
-                TrackItem item = mTracks.Dequeue();
-                if (i == 0)
-                    sb.AppendFormat("{0}\t time:{1}\r\n", item.Name, item.Time);
-                else
-                    sb.AppendFormat("\t\t\t{0}\t time:{1}\r\n", item.Name, item.Time);
-                i++;
-            }
-            node.Loger.Process(LogType.DEBUG, sb.ToString());
-        }
+			}
+			TrackItem item = new SmartRoute.Message.TrackItem { Name = name, Time = GetWatch().Elapsed.TotalMilliseconds };
+			mTracks.Enqueue(item);
+		}
+		[Conditional("DEBUG")]
+		public void EndTrack(string name, INode node)
+		{
+			Track(name);
+			int i = 0;
+			System.Text.StringBuilder sb = new System.Text.StringBuilder();
+			while (mTracks.Count > 0)
+			{
+				TrackItem item = mTracks.Dequeue();
+				if (i == 0)
+					sb.AppendFormat("{0}\t time:{1}\r\n", item.Name, item.Time);
+				else
+					sb.AppendFormat("\t\t\t{0}\t time:{1}\r\n", item.Name, item.Time);
+				i++;
+			}
+			node.Loger.Process(LogType.MESSAGE_DEBUG, sb.ToString());
+		}
 
-        #endregion
-    }
+		#endregion
+	}
 
-    public enum ReceiveMode : int
-    {
-        Eq = 0,
-        NotEq = 2,
-        All = 4,
-        Regex = 8
-    }
+	public enum ReceiveMode : int
+	{
+		Eq = 0,
+		NotEq = 2,
+		All = 4,
+		Regex = 8
+	}
 }

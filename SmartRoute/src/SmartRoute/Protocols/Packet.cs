@@ -63,8 +63,17 @@ namespace SmartRoute.Protocols
                         msg.Track("message decode start");
                         msg.IsLocal = false;
                         int datasize = reader.ReadInt32();
-                        Type dataType = TypeHandler.GetType(msg.DataType);
-                        msg.Data = reader.Stream.Deserialize(datasize, dataType);
+                        MessageType msgType = TypeHandler.GetMessageType(msg.DataType);
+                        if (msgType.IsCustomSerializer)
+                        {
+                            ISerializer body = msgType.Create();
+                            body.Deserialize(reader);
+                            msg.Data = body;
+                        }
+                        else
+                        {
+                            msg.Data = reader.Stream.Deserialize(datasize, msgType.Type);
+                        }
                         msg.Track("message decode completed");
                     }
 
@@ -98,7 +107,7 @@ namespace SmartRoute.Protocols
             if (msg != null)
             {
                 msg.Track("message GetType");
-                msg.DataType = TypeHandler.GetTypeName(msg.Data.GetType());
+                msg.DataType = TypeHandler.GetMessageType(msg.Data.GetType()).TypeName;
 
             }
             using (IWriteBlock msgsize = writer.Allocate4Bytes())
@@ -108,7 +117,7 @@ namespace SmartRoute.Protocols
                 using (IWriteBlock bodysize = writer.Allocate4Bytes())
                 {
                     int bodyStartlegnth = (int)writer.Length;
-                    ProtoBuf.Meta.RuntimeTypeModel.Default.Serialize(writer.Stream, data);
+                    data.Serialize(writer.Stream);
                     bodysize.SetData((int)writer.Length - bodyStartlegnth);
                 }
                 if (msg != null)
@@ -117,7 +126,15 @@ namespace SmartRoute.Protocols
                     using (IWriteBlock datasize = writer.Allocate4Bytes())
                     {
                         int dataStartlength = (int)writer.Length;
-                        ProtoBuf.Meta.RuntimeTypeModel.Default.Serialize(writer.Stream, msg.Data);
+                        object body = msg.Data;
+                        if (body is ISerializer)
+                        {
+                            ((ISerializer)body).Serialize(writer);
+                        }
+                        else
+                        {
+                            msg.Data.Serialize(writer.Stream);
+                        }
                         datasize.SetData((int)writer.Length - dataStartlength);
                     }
                     msg.Track("message write body completed!");

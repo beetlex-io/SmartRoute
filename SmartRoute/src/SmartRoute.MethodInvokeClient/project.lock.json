@@ -2213,20 +2213,6 @@
         "runtime": {
           "netstandard1.6/SmartRoute.dll": {}
         }
-      },
-      "SmartRoute.NodeTest.Messages/1.0.0": {
-        "type": "project",
-        "framework": ".NETStandard,Version=v1.6",
-        "dependencies": {
-          "NETStandard.Library": "1.6.0",
-          "protobuf-net": "2.1.0"
-        },
-        "compile": {
-          "netstandard1.6/SmartRoute.NodeTest.Messages.dll": {}
-        },
-        "runtime": {
-          "netstandard1.6/SmartRoute.NodeTest.Messages.dll": {}
-        }
       }
     }
   },
@@ -7156,18 +7142,12 @@
       "type": "project",
       "path": "../SmartRoute/project.json",
       "msbuildProject": "../SmartRoute/SmartRoute.xproj"
-    },
-    "SmartRoute.NodeTest.Messages/1.0.0": {
-      "type": "project",
-      "path": "../SmartRoute.NodeTest.Messages/project.json",
-      "msbuildProject": "../SmartRoute.NodeTest.Messages/SmartRoute.NodeTest.Messages.xproj"
     }
   },
   "projectFileDependencyGroups": {
     "": [
       "Microsoft.NETCore.App >= 1.0.1",
-      "SmartRoute >= 1.0.0-*",
-      "SmartRoute.NodeTest.Messages >= 1.0.0-*"
+      "SmartRoute >= 0.5.2-*"
     ],
     ".NETCoreApp,Version=v1.0": []
   },

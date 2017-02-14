@@ -9,6 +9,7 @@ namespace SmartRoute
     {
         public SRException()
         {
+            
         }
         public SRException(string message) : base(message) { }
 

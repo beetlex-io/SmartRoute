@@ -14,3 +14,7 @@ SmartRoute/src/SmartRoute.NodeServiceClient/bin/
 SmartRoute/src/SmartRoute.NodeServiceClient/obj/
 SmartRoute/src/SmartRoute.PacketTest/bin/
 SmartRoute/src/SmartRoute.PacketTest/obj/
+SmartRoute/src/SmartRoute.MethodInvokeServer/bin/
+SmartRoute/src/SmartRoute.MethodInvokeServer/obj/
+SmartRoute/src/SmartRoute.MethodInvokeClient/obj/
+SmartRoute/src/SmartRoute.MethodInvokeClient/bin/
