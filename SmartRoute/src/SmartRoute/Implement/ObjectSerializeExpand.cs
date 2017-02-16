@@ -51,7 +51,7 @@ namespace SmartRoute
 
         public static void Serialize(this object data, System.IO.Stream stream)
         {
-            ProtoBuf.Meta.RuntimeTypeModel.Default.Serialize(stream, data);
+           ProtoBuf.Meta.RuntimeTypeModel.Default.Serialize(stream, data);
         }
         public static object Deserialize(this System.IO.Stream stream, int length, Type type)
         {

@@ -15,7 +15,11 @@ namespace SmartRoute.MethodInvokeServer
 			node.Open();
 			SwitchSubscriber rmiserver = new SwitchSubscriber(node);
 			rmiserver.Register<IUserService>(new Program());
-			System.Threading.Thread.Sleep(-1);
+			while (true)
+			{
+				Console.Write(node.GetClusterInfo());
+				System.Threading.Thread.Sleep(1000);
+			}
 		}
 
 		public void ChangePWD(string name, string oldpwd, string newpwd)

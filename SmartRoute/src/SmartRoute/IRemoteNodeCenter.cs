@@ -17,6 +17,6 @@ namespace SmartRoute
 
         ICollection<INodeConnection> GetOnlines();
 
-
-    }
+		void IOStatistics(NodeResourceStatistics statis);
+	}
 }

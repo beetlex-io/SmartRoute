@@ -16,6 +16,9 @@ namespace SmartRoute.Protocols
         [ProtoMember(1)]
         public List<ServiceSubscriberItem> Items { get; set; }
 
+        [ProtoMember(2)]
+        public string RemoteNode { get; set; }
+
     }
     [ProtoContract]
     public class ServiceSubscriberItem

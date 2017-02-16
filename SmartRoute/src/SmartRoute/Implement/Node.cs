@@ -24,7 +24,15 @@ namespace SmartRoute
 
 		}
 
+		private NodeResourceStatistics mIoStatistics = new NodeResourceStatistics();
+
+		private object mLockStatistics = new object();
+
 		private bool mIsLinux = false;
+
+		private long mProcessingMessages;
+
+		private long mProcessedMessages;
 
 		private System.Threading.Timer mPingNodeTimer = null;
 
@@ -138,7 +146,7 @@ namespace SmartRoute
 				mBroadcastListen.Loger = Loger;
 				mBroadcastListen.Discover = OnDiscoverNode;
 				mBroadcastListen.Open();
-				mPingNodeTimer = new System.Threading.Timer(OnPingRemoteNode, null, 2000, 2000);
+				mPingNodeTimer = new System.Threading.Timer(OnPingRemoteNode, null, 1000, 1000);
 				Loger.Process(LogType.INFO, "[{0}] Node Start {1}@{2}", ID, Host, Port);
 				Status = NodeStatus.Start;
 			}
@@ -150,12 +158,25 @@ namespace SmartRoute
 
 		}
 
+		private void ProcessingMessage()
+		{
+
+			System.Threading.Interlocked.Increment(ref mProcessingMessages);
+		}
+
+		private void ProcessedMessage()
+		{
+			System.Threading.Interlocked.Decrement(ref mProcessingMessages);
+			System.Threading.Interlocked.Increment(ref mProcessedMessages);
+
+		}
+
 		private void OnPingRemoteNode(object state)
 		{
 			ICollection<INodeConnection> onlines = mRemoteNodeCenter.GetOnlines();
 			foreach (INodeConnection item in onlines)
 			{
-				if (item.PingCount > 5)
+				if (item.Pings >= 10)
 				{
 					INodeConnection result = mRemoteNodeCenter.UnRegister(item.RemoteNodeID);
 					mBroadcastListen.Remove(item.RemoteNodeID);
@@ -220,7 +241,10 @@ namespace SmartRoute
 		{
 			if (message is Ping)
 			{
-				server.Send(new Pong(), session);
+				Pong poing = new Pong();
+				poing.NodeID = ID;
+				poing.Properties = GetResourceStatistics();
+				server.Send(poing, session);
 			}
 			else if (message is BroadSubscriber)
 			{
@@ -412,17 +436,21 @@ namespace SmartRoute
 				message.Track("match consumers completed");
 				if (subs != null)
 				{
+					ProcessingMessage();
 					message.Track("publish to " + message.Consumers + subs.GetType());
 					subs.Process(this, message);
 					message.Track("publish to " + message.Consumers + " completed!");
+					ProcessedMessage();
 					return;
 				}
 				subs = mRemoteSubscriberCenter.Find(message.Consumers);
 				if (subs != null)
 				{
+					ProcessingMessage();
 					message.Track("publish to " + message.Consumers + subs.GetType());
 					subs.Process(this, message);
 					message.Track("publish to " + message.Consumers + " completed!");
+					ProcessedMessage();
 					return;
 				}
 				string error = string.Format("[{0}] subscriber not fount!", message.Consumers);
@@ -447,23 +475,26 @@ namespace SmartRoute
 				{
 					if (message.Pulisher == item.Name)
 						continue;
+					ProcessingMessage();
 					Message sendMsg = message.Copy();
 					sendMsg.Consumers = item.Name;
 
 					sendMsg.Mode = ReceiveMode.Eq;
 					message.Track("publish to " + sendMsg.Consumers + item.GetType());
 					item.Process(this, sendMsg);
+					ProcessedMessage();
 					message.Track("publish to " + sendMsg.Consumers + " completed!");
 				}
 				foreach (ISubscriber item in remote)
 				{
+					ProcessingMessage();
 					Message sendMsg = message.Copy();
 					sendMsg.Consumers = item.Name;
-
 					sendMsg.Mode = ReceiveMode.Eq;
 					message.Track("publish to " + sendMsg.Consumers + item.GetType());
 					item.Process(this, sendMsg);
 					message.Track("publish to " + sendMsg.Consumers + " completed!");
+					ProcessedMessage();
 				}
 			}
 
@@ -568,12 +599,65 @@ namespace SmartRoute
 			return mServer.GetRunTime();
 		}
 
+		public Dictionary<string, double> GetResourceStatistics()
+		{
+			lock (mLockStatistics)
+			{
+				long serveTime = mServer.GetRunTime();
+				if (serveTime - mIoStatistics.LastTime >= 1000)
+				{
+					NodeResourceStatistics nstatis = new NodeResourceStatistics();
+					nstatis.NetworkReceiveBytes = mServer.ReceivBytes;
+					nstatis.NetworkReceiveIO = mServer.ReceiveQuantity;
+					nstatis.NetworkSendBytes = mServer.SendBytes;
+					nstatis.NetworkSendIO = mServer.SendQuantity;
+					mRemoteNodeCenter.IOStatistics(nstatis);
 
+					nstatis.NetworkReceiveBytesPersecond = nstatis.NetworkReceiveBytes - mIoStatistics.NetworkReceiveBytes;
+					nstatis.NetworkReceiveIOPersecond = nstatis.NetworkReceiveIO - mIoStatistics.NetworkReceiveIO;
+					nstatis.NetworkSendBytesPersecond = nstatis.NetworkSendBytes - mIoStatistics.NetworkSendBytes;
+					nstatis.NetworkSendIOPersecond = nstatis.NetworkSendIO - mIoStatistics.NetworkSendIO;
+
+
+					if (GetResourceStatisticsEvent != null)
+					{
+						GetResourceStatisticsEvent(nstatis, this);
+					}
+					nstatis.LastTime = serveTime;
+					mIoStatistics = nstatis;
+				}
+				mIoStatistics.ProcessedMessages = mProcessedMessages;
+				mIoStatistics.ProcessingMessages = mProcessingMessages;
+				return mIoStatistics.ToProperties();
+			}
+		}
+
+		public ClusterInfo GetClusterInfo()
+		{
+			ClusterInfo result = new SmartRoute.ClusterInfo(this.Cluster);
+			NodeInfo node = new SmartRoute.NodeInfo(ID, true);
+			node.Statistics = new NodeResourceStatistics();
+			node.Statistics.FromProperties(GetResourceStatistics());
+			result.Nodes.Add(node);
+			foreach (INodeConnection item in mRemoteNodeCenter.GetOnlines())
+			{
+				node = new SmartRoute.NodeInfo(item.RemoteNodeID, false);
+				node.Statistics = new SmartRoute.NodeResourceStatistics();
+				node.Statistics.FromProperties(item.ResourceStatistics);
+				result.Nodes.Add(node);
+			}
+			return result;
+		}
 
 		public EventSubscriberRegisted SubscriberRegisted
 		{
 			get;
 			set;
+		}
+
+		public Action<NodeResourceStatistics, INode> GetResourceStatisticsEvent
+		{
+			get; set;
 		}
 
 		public object this[string key]
