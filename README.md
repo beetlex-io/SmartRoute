@@ -1,5 +1,6 @@
 # SmartRoute（服务即集群）
   SmartRoute是基于Dotnet Core设计的可运行在linux和windows下的服务通讯组件，其设计理念是去中心化和零配置即可实现服务通讯集群。SmartRoute是通过消息订阅的机制实现服务与服务之间的通讯，它可以让广播网段内所有服务器上的应用自动构建通讯集群； 而通讯集群完全是SmartRoute自动构建并不需要进行任何配置或安装中间服务。通过这种全新的通讯开发方式可以让开发者更轻松和简单地构建基于服务的集群通讯应用。
+  ![image](https://github.com/IKende/SmartRoute/blob/master/smartroute.jpg)
 ## 扩展服务
 ### 分布式业务号生成服务 https://github.com/IKende/SmartRoute.BNR
 ### 分布式锁服务 https://github.com/IKende/SmartRoute.DLocks
