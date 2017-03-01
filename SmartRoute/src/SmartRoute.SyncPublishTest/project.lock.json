@@ -3,13 +3,19 @@
   "version": 2,
   "targets": {
     ".NETCoreApp,Version=v1.0": {
-      "BeetleX/0.8.6": {
+      "BeetleX/0.8.9": {
         "type": "package",
+        "dependencies": {
+          "System.Collections.Concurrent": "4.0.12",
+          "System.Net.NameResolution": "4.0.0",
+          "System.Threading.Thread": "4.0.0",
+          "System.Threading.ThreadPool": "4.0.10"
+        },
         "compile": {
-          "lib/.NETStandard1.6/BeetleX.dll": {}
+          "lib/.NETStandard1.5/BeetleX.dll": {}
         },
         "runtime": {
-          "lib/.NETStandard1.6/BeetleX.dll": {}
+          "lib/.NETStandard1.5/BeetleX.dll": {}
         }
       },
       "Libuv/1.9.0": {
@@ -2192,11 +2198,11 @@
           "lib/netstandard1.3/_._": {}
         }
       },
-      "SmartRoute/0.6.2": {
+      "SmartRoute/0.7.3": {
         "type": "project",
-        "framework": ".NETStandard,Version=v1.6",
+        "framework": ".NETStandard,Version=v1.5",
         "dependencies": {
-          "BeetleX": "0.8.6",
+          "BeetleX": "0.8.9",
           "Microsoft.NETCore.Portable.Compatibility": "1.0.0",
           "NETStandard.Library": "1.6.0",
           "System.Net.NameResolution": "4.0.0",
@@ -2208,10 +2214,10 @@
           "protobuf-net": "2.1.0"
         },
         "compile": {
-          "netstandard1.6/SmartRoute.dll": {}
+          "netstandard1.5/SmartRoute.dll": {}
         },
         "runtime": {
-          "netstandard1.6/SmartRoute.dll": {}
+          "netstandard1.5/SmartRoute.dll": {}
         }
       },
       "SmartRoute.NodeTest.Messages/1.0.0": {
@@ -2231,14 +2237,14 @@
     }
   },
   "libraries": {
-    "BeetleX/0.8.6": {
-      "sha512": "fCBAzlP1Q/TdW1jin0r0fToquto1D7h7ZnC94z9cZ0mXhKf5uDo31MMzUhUawfKsIXPbtoaggjpvOVjWke1h2g==",
+    "BeetleX/0.8.9": {
+      "sha512": "utqVQ/kXbGloTVh+CwzBExPHmz1k3MuImaurMG5LsJrwyxUlCKlovQbR07DXmnE/tMvxF6W4RuK3jZyS4hdmdw==",
       "type": "package",
-      "path": "BeetleX/0.8.6",
+      "path": "BeetleX/0.8.9",
       "files": [
-        "BeetleX.0.8.6.nupkg.sha512",
+        "BeetleX.0.8.9.nupkg.sha512",
         "BeetleX.nuspec",
-        "lib/.NETStandard1.6/BeetleX.dll",
+        "lib/.NETStandard1.5/BeetleX.dll",
         "lib/net40/BeetleX.dll",
         "lib/net45/BeetleX.dll",
         "lib/net46/BeetleX.dll"
@@ -7152,7 +7158,7 @@
         "ref/xamarinwatchos10/_._"
       ]
     },
-    "SmartRoute/0.6.2": {
+    "SmartRoute/0.7.3": {
       "type": "project",
       "path": "../SmartRoute/project.json",
       "msbuildProject": "../SmartRoute/SmartRoute.xproj"

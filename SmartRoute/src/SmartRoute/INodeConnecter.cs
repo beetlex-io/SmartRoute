@@ -7,34 +7,36 @@ using System.Threading.Tasks;
 
 namespace SmartRoute
 {
-    public interface INodeConnection : IDisposable
-    {
-        IClient Client
-        { get; }
+	public interface INodeConnection : IDisposable
+	{
+		IClient Client
+		{ get; }
 
-        object this[string key] { get; set; }
+		object this[string key] { get; set; }
 
-        void Connect();
+		void Connect();
 
-        INode Node { get; }
+		INode Node { get; }
 
-        string Host { get; set; }
+		string Host { get; set; }
 
-        int Port { get; set; }
+		int Port { get; set; }
 
-        string RemoteNodeID { get; set; }
+		string RemoteNodeID { get; set; }
 
-        bool Available { get; }
+		bool Available { get; }
 
-        void Send(object data);
+		void Send(object data);
 
-        void Ping();
+		void Ping();
 
-        int PingCount { get; }
+		int Pings { get; }
 
-        EventNodeConnecterReceive Receive { get; set; }
+		EventNodeConnecterReceive Receive { get; set; }
 
-        void SyncSubscriber();
+		void SyncSubscriber();
 
-    }
+		Dictionary<string, double> ResourceStatistics { get; }
+
+	}
 }

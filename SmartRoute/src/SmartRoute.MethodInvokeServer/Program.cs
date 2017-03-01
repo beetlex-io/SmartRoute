@@ -13,19 +13,22 @@ namespace SmartRoute.MethodInvokeServer
 			node.Loger.Type = LogType.ALL;
 			node.AddLogHandler(new SmartRoute.ConsoleLogHandler(LogType.ALL));
 			node.Open();
-			SwitchSubscriber rmiserver = new SwitchSubscriber(node);
-			rmiserver.Register<IUserService>(new Program());
-			System.Threading.Thread.Sleep(-1);
+			node.RegisterService<IUserService>(new Program());
+			while (true)
+			{
+				Console.Write(node.GetClusterInfo());
+				System.Threading.Thread.Sleep(1000);
+			}
 		}
 
 		public void ChangePWD(string name, string oldpwd, string newpwd)
 		{
-			Console.WriteLine("ChangePWD {0}/{1}/{2}", name, oldpwd, newpwd);
+			//Console.WriteLine("ChangePWD {0}/{1}/{2}", name, oldpwd, newpwd);
 		}
 
 		public DateTime Register(string name, string email)
 		{
-			Console.WriteLine("register {0}/{1}", name, email);
+			//Console.WriteLine("register {0}/{1}", name, email);
 			return DateTime.Now;
 		}
 	}

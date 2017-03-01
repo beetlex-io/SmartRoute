@@ -6,50 +6,69 @@ using System.Threading.Tasks;
 
 namespace SmartRoute
 {
-    public interface INode : IDisposable
-    {
+	public interface INode : IDisposable
+	{
 
-        object this[string key] { get; set; }
+		object this[string key] { get; set; }
 
-        ILogHandler Loger { get; }
+		ILogHandler Loger { get; }
 
-        long GetRuntime();
+		long GetRuntime();
 
-        string ID { get; }
+		string ID { get; }
 
-        string Cluster { get; set; }
+		string Cluster { get; set; }
 
-        string Host { get; set; }
+		string Host { get; set; }
 
-        string TokenKey { get; set; }
+		string TokenKey { get; set; }
 
-        int Port { get; set; }
+		int Port { get; set; }
 
-        void Open();
+		void Open();
 
-        void AddLogHandler<T>() where T : ILogHandler, new();
+		void AddLogHandler<T>() where T : ILogHandler, new();
 
-        void AddLogHandler(ILogHandler item);
+		void AddLogHandler(ILogHandler item);
 
-        NodeStatus Status { get; }
+		NodeStatus Status { get; }
 
-        T Register<T>(string name) where T : ISubscriber, new();
+		T Register<T>(string name) where T : ISubscriber, new();
 
-        void Register(string name, ISubscriber subscriber);
+		void Register(string name, ISubscriber subscriber);
 
-        void UnRegister(string name);
+		void UnRegister(string name);
 
-        void Publish(Message message);
+		void Publish(Message message);
 
-        T PublishSync<T>(Message message, int millisecondsTimeout = 10000);
+		T PublishSync<T>(Message message, int millisecondsTimeout = 10000);
 
-        object PublishSync(Message message, int millisecondsTimeout = 10000);
+		object PublishSync(Message message, int millisecondsTimeout = 10000);
 
-        ICollection<ISubscriber> GetLocalSubscriber();
+		ICollection<ISubscriber> GetLocalSubscriber();
 
-        ICollection<ISubscriber> GetRemoteSubscriber();
+		ICollection<ISubscriber> GetRemoteSubscriber();
 
-        EventSubscriberRegisted SubscriberRegisted { get; set; }
+		event EventSubscriberRegisted SubscriberRegisted;
 
-    }
+		Dictionary<string, double> GetResourceStatistics();
+
+		Action<NodeResourceStatistics, INode> GetResourceStatisticsEvent { get; set; }
+
+		ClusterInfo GetClusterInfo();
+
+		EventSubscriber DefaultEventSubscriber { get; }
+
+		SwitchSubscriber DefaultSwitchSubscriber { get; }
+
+		void RegisterService<T>(object service);
+
+		Object MethodInvoke(string name, string method, params object[] parameters);
+
+		T MethodInvoke<T>(string name, string method, params object[] parameters);
+
+		object PublishToService(string service, object data);
+
+		T PublishToService<T>(string service, object data);
+	}
 }

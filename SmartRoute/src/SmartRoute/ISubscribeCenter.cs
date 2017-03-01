@@ -5,23 +5,26 @@ using System.Threading.Tasks;
 
 namespace SmartRoute
 {
-    public interface ISubscriberCenter : IDisposable
-    {
+	public interface ISubscriberCenter : IDisposable
+	{
 
-        INode Node { get; set; }
+		INode Node { get; set; }
 
-        void Register(string name, ISubscriber subscriber);
+		void Register(string name, ISubscriber subscriber);
 
-        ISubscriber UnRegister(string name);
+		ISubscriber UnRegister(string name);
 
-        IList<ISubscriber> Find(string name, ReceiveMode mode);
+		void Find(string name, ReceiveMode mode, IList<ISubscriber> items);
 
-        IList<ISubscriber> Find(Message message);
+		void Find(Message message, IList<ISubscriber> items);
 
-        ISubscriber Find(string name);
+		ISubscriber Find(string name);
 
-        string[] GetAll();
+		string[] GetAll();
 
-        ICollection<ISubscriber> GetAllSubscriber();
-    }
+		ICollection<ISubscriber> GetAllSubscriber();
+
+		long Version { get; }
+
+	}
 }

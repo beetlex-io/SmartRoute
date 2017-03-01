@@ -7,184 +7,197 @@ using SmartRoute.Events;
 
 namespace SmartRoute
 {
-    class NodeConnecter : INodeConnection
-    {
+	class NodeConnecter : INodeConnection
+	{
 
-        public NodeConnecter(INode node, string remoteNode, string host, int port)
-        {
-            Node = node;
-            RemoteNodeID = remoteNode;
-            Host = host;
-            Port = port;
-            mClient = BeetleX.ServerFactory.CreateTcpClient(Host, Port);
-            mClient.Packet = new Protocols.ClientPacket();
-            mClient.ConnectedServer = OnConnected;
-            mClient.ClientError = OnError;
-            mClient.Packet.Completed = OnReceive;
-        }
+	
 
-        private int mPingCount = 0;
+		public NodeConnecter(INode node, string remoteNode, string host, int port)
+		{
+			Node = node;
+			RemoteNodeID = remoteNode;
+			Host = host;
+			Port = port;
+			mClient = BeetleX.ServerFactory.CreateTcpClient(Host, Port);
+			mClient.Packet = new Protocols.ClientPacket();
+			mClient.ConnectedServer = OnConnected;
+			mClient.ClientError = OnError;
+			mClient.Packet.Completed = OnReceive;
+			ResourceStatistics = new Dictionary<string, double>();
+		}
 
-        private int mConnectStatus = 0;
+		private int mPings = 0;
 
-        private bool mIsSyncSubscriber = false;
+		private int mConnectStatus = 0;
 
-        private IClient mClient;
+		private bool mIsSyncSubscriber = false;
 
-        private Dictionary<string, Object> mProperties = new Dictionary<string, object>();
+		private IClient mClient;
 
-        public object this[string key]
-        {
-            get
-            {
-                object result = null;
-                mProperties.TryGetValue(key, out result);
-                return result;
-            }
+		private Dictionary<string, Object> mProperties = new Dictionary<string, object>();
 
-            set
-            {
-                mProperties[key] = value;
-            }
-        }
+		public object this[string key]
+		{
+			get
+			{
+				object result = null;
+				mProperties.TryGetValue(key, out result);
+				return result;
+			}
 
-        public bool Available
-        {
-            get
-            {
-                return mClient.Connected && mPingCount < 5;
-            }
-        }
+			set
+			{
+				mProperties[key] = value;
+			}
+		}
 
-        public IClient Client
-        {
-            get
-            {
-                return mClient;
-            }
-        }
+		public bool Available
+		{
+			get
+			{
+				return mClient.Connected && mPings < 5;
+			}
+		}
 
-        public string Host
-        {
-            get; set;
-        }
+		public IClient Client
+		{
+			get
+			{
+				return mClient;
+			}
+		}
 
-        public INode Node
-        {
-            get;
-            internal set;
-        }
+		public string Host
+		{
+			get; set;
+		}
 
-        public string RemoteNodeID
-        {
-            get; set;
-        }
+		public INode Node
+		{
+			get;
+			internal set;
+		}
 
-        public int Port
-        {
-            get; set;
-        }
+		public string RemoteNodeID
+		{
+			get; set;
+		}
 
-        public EventNodeConnecterReceive Receive
-        {
-            get; set;
-        }
+		public int Port
+		{
+			get; set;
+		}
 
-        public int PingCount
-        {
-            get
-            {
-                return mPingCount;
-            }
-        }
+		public EventNodeConnecterReceive Receive
+		{
+			get; set;
+		}
 
-        public void Ping()
-        {
-            System.Threading.Interlocked.Increment(ref mPingCount);
-            if (Available)
-            {
-                Protocols.Ping ping = new Protocols.Ping();
-                mClient.Send(ping);
+		public int Pings
+		{
+			get
+			{
+				return mPings;
+			}
+		}
 
-            }
-            else
-            {
-                ConnectToServer();
-            }
+		public Dictionary<string, double> ResourceStatistics
+		{
+			get;
+			private set;
+		}
 
-        }
+		public void Ping()
+		{
+			System.Threading.Interlocked.Increment(ref mPings);
+			if (Available)
+			{
+				Protocols.Ping ping = new Protocols.Ping();
 
-        public void Send(object data)
-        {
-            if (!Available)
-                throw new SRException("{0} node connecter not a available!", RemoteNodeID);
-            mClient.Send(data);
-        }
+				mClient.Send(ping);
 
-        public void Connect()
-        {
+			}
+			else
+			{
+				ConnectToServer();
+			}
 
-            ConnectToServer();
-        }
+		}
 
-        private void ConnectToServer()
-        {
-            if (System.Threading.Interlocked.CompareExchange(ref mConnectStatus, 1, 0) == 0)
-            {
-                System.Threading.ThreadPool.QueueUserWorkItem(o =>
-                {
+		public void Send(object data)
+		{
+			if (!Available)
+				throw new SRException("{0} node connecter not a available!", RemoteNodeID);
+			mClient.Send(data);
+		}
 
-                    if (mClient.Connect())
-                        System.Threading.Interlocked.Exchange(ref mPingCount, 0);
-                    System.Threading.Interlocked.Exchange(ref mConnectStatus, 0);
-                });
-            }
-        }
+		public void Connect()
+		{
 
-        private void OnConnected(IClient c)
-        {
-            mIsSyncSubscriber = false;
-            Protocols.Authentication auth = new Protocols.Authentication();
-            auth.NodeID = Node.ID;
-            auth.Token = (auth.NodeID + Node.TokenKey).GetMd5Hash();
-            c.Send(auth);
+			ConnectToServer();
+		}
 
-        }
+		private void ConnectToServer()
+		{
+			if (System.Threading.Interlocked.CompareExchange(ref mConnectStatus, 1, 0) == 0)
+			{
+				System.Threading.ThreadPool.QueueUserWorkItem(o =>
+				{
 
-        public void SyncSubscriber()
-        {
-            if (!mIsSyncSubscriber)
-            {
-                Protocols.GetSubscribers sync = new Protocols.GetSubscribers();
-                sync.NodeID = Node.ID;
-                mClient.Send(sync);
-                mIsSyncSubscriber = true;
-            }
-        }
+					if (mClient.Connect())
+						System.Threading.Interlocked.Exchange(ref mPings, 0);
+					System.Threading.Interlocked.Exchange(ref mConnectStatus, 0);
+				});
+			}
+		}
 
-        private void OnError(IClient c, Exception e, string message)
-        {
-            Node.Loger.Process(LogType.ERROR, "{0} node network error {1}", RemoteNodeID, message);
-        }
+		private void OnConnected(IClient c)
+		{
+			mIsSyncSubscriber = false;
+			Protocols.Authentication auth = new Protocols.Authentication();
+			auth.NodeID = Node.ID;
+			auth.Token = (auth.NodeID + Node.TokenKey).GetMd5Hash();
+			c.Send(auth);
 
-        private void OnReceive(IClient c, object data)
-        {
-            if (data is Protocols.Pong)
-            {
-                System.Threading.Interlocked.Decrement(ref mPingCount);
-            }
-            else
-            {
-                if (Receive != null)
-                    Receive(this, data);
-            }
-        }
+		}
 
-        public void Dispose()
-        {
-            this.Client.DisConnect();
-            mProperties.Clear();
-            Node = null;
-        }
-    }
+		public void SyncSubscriber()
+		{
+			if (!mIsSyncSubscriber)
+			{
+				Protocols.GetSubscribers sync = new Protocols.GetSubscribers();
+				sync.NodeID = Node.ID;
+				mClient.Send(sync);
+				mIsSyncSubscriber = true;
+			}
+		}
+
+		private void OnError(IClient c, Exception e, string message)
+		{
+			Node.Loger.Process(LogType.ERROR, "{0} node network error {1}", RemoteNodeID, message);
+		}
+
+		private void OnReceive(IClient c, object data)
+		{
+			if (data is Protocols.Pong)
+			{
+				Protocols.Pong pong = (Protocols.Pong)data;
+				System.Threading.Interlocked.Decrement(ref mPings);
+				ResourceStatistics = pong.Properties;
+
+			}
+			else
+			{
+				if (Receive != null)
+					Receive(this, data);
+			}
+		}
+
+		public void Dispose()
+		{
+			this.Client.DisConnect();
+			mProperties.Clear();
+			Node = null;
+		}
+	}
 }

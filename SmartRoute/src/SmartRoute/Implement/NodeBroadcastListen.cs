@@ -117,7 +117,7 @@ namespace SmartRoute
             set;
         }
 
-        public async void Open()
+        public void Open()
         {
 
             foreach (NetworkInterface ni in NetworkInterface.GetAllNetworkInterfaces())

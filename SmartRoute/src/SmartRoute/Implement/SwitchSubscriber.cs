@@ -34,7 +34,7 @@ namespace SmartRoute
 			foreach (Protocols.ServiceSubscriberItem item in e.Items)
 			{
 				RemoteService service = GetRemoteService(item.Service, out create);
-				service.Register(item.Name, Node);
+				service.Register(item.Name, Node, e.RemoteNode);
 				if (create)
 				{
 					if (ServiceRegisted != null)
@@ -54,6 +54,7 @@ namespace SmartRoute
 				if (count > 0)
 				{
 					Protocols.SyncServiceInfo services = new Protocols.SyncServiceInfo();
+					services.RemoteNode = this.Node.ID;
 					for (int i = 0; i < count; i++)
 						services.Items.Add(mLocalServices[i].GetInfo());
 					string receive = @".+@" + mSwitchName;
@@ -110,12 +111,14 @@ namespace SmartRoute
 
 		public string Name
 		{
-			get; set;
+			get;
+			set;
 		}
 
 		public INode Node
 		{
-			get; set;
+			get;
+			set;
 		}
 
 		public EventSubscriber GetService(string serviceName)
