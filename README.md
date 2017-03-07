@@ -4,6 +4,36 @@
 ##扩展服务
 [分布式业务号生成服务:https://github.com/IKende/SmartRoute.BNR](https://github.com/IKende/SmartRoute.BNR)  
 [分布式锁服务https  ://github.com/IKende/SmartRoute.DLocks](https://github.com/IKende/SmartRoute.DLocks)
+##给Node初始化默认的订阅，并提供更简单的操作方式 2017-3-1
+``` c#
+	public class Program : IUserService
+	{
+		public static void Main(string[] args)
+		{
+			INode node = SmartRoute.NodeFactory.Default;
+			node.Loger.Type = LogType.ALL;
+			node.AddLogHandler(new SmartRoute.ConsoleLogHandler(LogType.ALL));
+			node.Open();
+			node.RegisterService<IUserService>(new Program());
+			while (true)
+			{
+				Console.Write(node.GetClusterInfo());
+				System.Threading.Thread.Sleep(1000);
+			}
+		}
+
+		public void ChangePWD(string name, string oldpwd, string newpwd)
+		{
+			Console.WriteLine("ChangePWD {0}/{1}/{2}", name, oldpwd, newpwd);
+		}
+
+		public DateTime Register(string name, string email)
+		{
+			Console.WriteLine("register {0}/{1}", name, email);
+			return DateTime.Now;
+		}
+	}
+```
 ##提供集群节点监控功能 2017-2-16　
    通过任意一个节点获取整个集群节点的状态信息,主要包括:网络IO,网络流量,消息处理量和当前每秒相应并发量的信息.
 ``` c#
