@@ -42,7 +42,7 @@ namespace SmartRoute.NodeServiceClient
 			{
 				try
 				{
-					var item = mSwitchSubscriber.PublishToService<IList<Employee>>("henry", Employee.GetEmployee());
+					var item = mSwitchSubscriber.SyncToService<IList<Employee>>("henry", Employee.GetEmployee());
 					System.Threading.Interlocked.Increment(ref mCount);
 				}
 				catch (Exception e_)

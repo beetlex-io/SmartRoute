@@ -1454,7 +1454,7 @@
       ]
     },
     "protobuf-net/2.1.0": {
-      "sha512": "0BVNsKmrs1xd6P6UXbFh6ssNUc/2oGZuWs+q+cxW2NLtib1l0ijFMoVtMoWWESy8ktDZ7FjneuZaDbY5MvGV4g==",
+      "sha512": "8ijiRUzGcB9SYo2ohIujk5s93MeaXF+/xd9WBGCgS1SqQyOC5gUTnCKIXZPlf8a6UROkK70McJloL4P19IvghQ==",
       "type": "package",
       "path": "protobuf-net/2.1.0",
       "files": [

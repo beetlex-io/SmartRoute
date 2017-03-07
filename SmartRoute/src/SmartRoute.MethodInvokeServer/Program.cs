@@ -23,12 +23,12 @@ namespace SmartRoute.MethodInvokeServer
 
 		public void ChangePWD(string name, string oldpwd, string newpwd)
 		{
-			//Console.WriteLine("ChangePWD {0}/{1}/{2}", name, oldpwd, newpwd);
+			Console.WriteLine("ChangePWD {0}/{1}/{2}", name, oldpwd, newpwd);
 		}
 
 		public DateTime Register(string name, string email)
 		{
-			//Console.WriteLine("register {0}/{1}", name, email);
+			Console.WriteLine("register {0}/{1}", name, email);
 			return DateTime.Now;
 		}
 	}

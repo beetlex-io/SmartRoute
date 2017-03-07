@@ -1,5 +1,5 @@
 {
-  "version": "0.7.6-*",
+  "version": "0.7.9-*",
   "dependencies": {
     "NETStandard.Library": "1.6.0",
     "protobuf-net": "2.1.0",

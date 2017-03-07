@@ -694,12 +694,12 @@ namespace SmartRoute
 
 		public object PublishToService(string service, object data)
 		{
-			return DefaultSwitchSubscriber.PublishToService(service, data);
+			return DefaultSwitchSubscriber.SyncToService(service, data);
 		}
 
 		public T PublishToService<T>(string service, object data)
 		{
-			return DefaultSwitchSubscriber.PublishToService<T>(service, data);
+			return DefaultSwitchSubscriber.SyncToService<T>(service, data);
 		}
 
 		public event EventSubscriberRegisted SubscriberRegisted;

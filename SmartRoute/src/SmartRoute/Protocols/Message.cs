@@ -49,7 +49,20 @@ namespace SmartRoute
 		[ProtoMember(5)]
 		public ReceiveMode Mode { get; set; }
 
-		public object Data { get; set; }
+
+		private object mData;
+
+		public object Data
+		{
+			get
+			{
+				return mData;
+			}
+			set
+			{
+				mData = value;
+			}
+		}
 
 		public void Reply(object body)
 		{
@@ -63,7 +76,21 @@ namespace SmartRoute
 			result.EndTrack("reply message completed!", Subscriber.Node);
 		}
 
-		internal bool IsLocal { get; set; }
+
+		private bool mIsLocal;
+
+		internal bool IsLocal
+		{
+			get
+			{
+				return mIsLocal;
+
+			}
+			set
+			{
+				mIsLocal = value;
+			}
+		}
 
 		public Message Copy()
 		{
@@ -79,7 +106,20 @@ namespace SmartRoute
 
 		}
 
-		public ISubscriber Subscriber { get; set; }
+
+		private ISubscriber mSubscriber;
+
+		internal ISubscriber Subscriber
+		{
+			get
+			{
+				return mSubscriber;
+			}
+			set
+			{
+				mSubscriber = value;
+			}
+		}
 
 		internal void ProcessError(Exception error)
 		{
@@ -89,9 +129,19 @@ namespace SmartRoute
 			}
 		}
 
+		private PublishResult mAsyncResult;
+
 		internal PublishResult AsyncResult
 		{
-			get; set;
+			get
+			{
+				return mAsyncResult;
+			}
+			set
+			{
+				mAsyncResult = value;
+			}
+
 		}
 
 		#region track process time

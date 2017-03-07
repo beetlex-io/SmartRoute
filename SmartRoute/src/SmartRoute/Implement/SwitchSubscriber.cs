@@ -109,6 +109,15 @@ namespace SmartRoute
 			return subscriber;
 		}
 
+
+		public EventSubscriber DefaultEventSubscriber
+		{
+			get
+			{
+				return mDefaultEventSubscriber;
+			}
+		}
+
 		public string Name
 		{
 			get;
@@ -134,7 +143,7 @@ namespace SmartRoute
 			return item;
 		}
 
-		public object PublishToService(string service, object data)
+		public object SyncToService(string service, object data)
 		{
 			RemoteServiceSubscriber subscriber = GetRemoteServiceSubscriber(service);
 
@@ -150,13 +159,13 @@ namespace SmartRoute
 			return result;
 		}
 
-		public T PublishToService<T>(string service, object data)
+		public T SyncToService<T>(string service, object data)
 		{
-			return (T)PublishToService(service, data);
+			return (T)SyncToService(service, data);
 
 		}
 
-		public void PublishToServicee(string service, object data)
+		public void ToService(string service, object data)
 		{
 			RemoteServiceSubscriber subscriber = GetRemoteServiceSubscriber(service);
 			Message msg = new Message();
@@ -206,7 +215,7 @@ namespace SmartRoute
 			msg.Name = name;
 			msg.Method = method;
 			msg.Parameters = parameters;
-			object result = PublishToService(name, msg);
+			object result = SyncToService(name, msg);
 			if (result is Protocols.Error)
 			{
 				throw new SRException(string.Format("Invoke {0}.{1} error {2}!", name, method, ((Protocols.Error)result).Message));
